@@ -40,18 +40,38 @@ function createServer(options = {}) {
   const port = Number(process.env.APP_PORT || process.env.PORT || options.port || 3001);
   const host = options.host || '0.0.0.0';
 
-  console.log('Port selection: ', {
+  console.log('[createServer] Port selection:', {
     APP_PORT: process.env.APP_PORT || null,
     PLATFORM_PORT: process.env.PORT || null,
     final: port
   });
 
+  console.log('[createServer] loading credentials');
   const credentials = loadCredentials();
-  const speechClient = credentials ? new SpeechClient({ credentials }) : new SpeechClient();
+  console.log('[createServer] credentials loaded:', credentials ? 'yes' : 'no');
 
-  const wss = new WebSocket.Server({ port, host }, () => {
-    console.log(`WebSocket STT server listening on ${host}:${port}`);
-  });
+  let speechClient = null;
+  try {
+    console.log('[createServer] creating SpeechClient');
+    speechClient = credentials ? new SpeechClient({ credentials }) : new SpeechClient();
+    console.log('[createServer] SpeechClient created');
+  } catch (err) {
+    console.error('[createServer] Failed to create SpeechClient:', err && err.stack ? err.stack : err);
+    // fail fast so logs show the reason
+    throw err;
+  }
+
+  let wss;
+  try {
+    console.log('[createServer] creating WebSocket.Server');
+    wss = new WebSocket.Server({ port, host }, () => {
+      console.log(`[createServer] WebSocket STT server listening on ${host}:${port}`);
+    });
+    console.log('[createServer] WebSocket.Server created');
+  } catch (err) {
+    console.error('[createServer] Failed to create WebSocket.Server:', err && err.stack ? err.stack : err);
+    throw err;
+  }
 
   wss.on('connection', function connection(ws) {
     console.log('New client connected');
