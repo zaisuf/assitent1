@@ -136,6 +136,17 @@ function createServer(options = {}) {
 
 // If run directly, start the server
 if (require.main === module) {
+  // Add global handlers so startup errors are visible in the platform logs
+  process.on('uncaughtException', (err) => {
+    console.error('uncaughtException:', err && err.stack ? err.stack : err);
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', (reason) => {
+    console.error('unhandledRejection:', reason && reason.stack ? reason.stack : reason);
+    process.exit(1);
+  });
+
   createServer();
 }
 
