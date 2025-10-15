@@ -1,3 +1,4 @@
+console.log('[index.js] module loading');
 const fs = require('fs');
 const path = require('path');
 const WebSocket = require('ws');
