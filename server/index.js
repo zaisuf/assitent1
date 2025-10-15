@@ -34,8 +34,16 @@ function loadCredentials() {
 }
 
 function createServer(options = {}) {
-  const port = Number(process.env.PORT || options.port || 3001);
+  // Prefer APP_PORT to allow platforms which inject PORT to remain untouched.
+  // This avoids UI warnings when changing the platform provided PORT env var.
+  const port = Number(process.env.APP_PORT || process.env.PORT || options.port || 3001);
   const host = options.host || '0.0.0.0';
+
+  console.log('Port selection: ', {
+    APP_PORT: process.env.APP_PORT || null,
+    PLATFORM_PORT: process.env.PORT || null,
+    final: port
+  });
 
   const credentials = loadCredentials();
   const speechClient = credentials ? new SpeechClient({ credentials }) : new SpeechClient();
