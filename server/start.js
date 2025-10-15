@@ -11,8 +11,18 @@ if (!fs.existsSync(indexPath)) {
 }
 
 try {
-  // Require the server file; it will start when run directly
-  require(indexPath);
+  // Require the server file and start the server by calling its exported createServer
+  const srv = require(indexPath);
+  if (srv && typeof srv.createServer === 'function') {
+    console.log('[start.js] calling createServer() exported from index.js');
+    srv.createServer();
+  } else if (typeof srv === 'function') {
+    // support both default export styles
+    console.log('[start.js] module exported a function, calling it');
+    srv();
+  } else {
+    console.warn('[start.js] index.js did not export createServer(); server may not start automatically.');
+  }
 } catch (err) {
   // Make sure startup errors are visible in platform logs
   console.error('Failed to start server (caught in start.js):');
