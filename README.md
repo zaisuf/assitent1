@@ -38,7 +38,8 @@ Then stream raw PCM 16-bit little-endian LINEAR16 at 16kHz as binary messages. W
 
 Deploying
 
-- Render / Railway: set `PORT` (some platforms provide this automatically) and add a secret or file for `GOOGLE_APPLICATION_CREDENTIALS`. On Render you can upload the JSON as a secret and point the env var to the file path.
+- Render / Railway: platforms usually inject a `PORT` env var automatically. To avoid overwriting that and seeing UI warnings when updating built-in variables, set `APP_PORT` instead if you need a fixed port (for example, `APP_PORT=3001`). The server prefers `APP_PORT` and falls back to the platform-provided `PORT`.
+	Also add a secret or file for `GOOGLE_APPLICATION_CREDENTIALS`. On Render you can upload the JSON as a secret and point the env var to the file path.
 - Heroku: add the credentials JSON to a config var (base64-encoded) and write a small start script to decode it to a file and set `GOOGLE_APPLICATION_CREDENTIALS` before starting.
 
 Security note
