@@ -1,3 +1,4 @@
+console.log('[start.js] start wrapper launching');
 const path = require('path');
 const fs = require('fs');
 
