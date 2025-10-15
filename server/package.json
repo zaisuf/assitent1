@@ -1,0 +1,21 @@
+{
+  "name": "webstock-stt-server",
+  "version": "1.0.0",
+  "description": "Standalone WebSocket server for Google Cloud Speech-to-Text (used by webstock)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "dependencies": {
+    "@google-cloud/speech": "^5.0.0",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "license": "MIT"
+}
