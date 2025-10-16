@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node server/start.js",
+    "start": "node index.js",
     "postinstall": "cd server && npm install --no-audit --no-fund"
   },
   "engines": {
