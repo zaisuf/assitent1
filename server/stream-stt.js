@@ -1,3 +1,4 @@
+const http = require('http');
 const WebSocket = require('ws');
 const { SpeechClient } = require('@google-cloud/speech');
 
@@ -101,9 +102,36 @@ const supportedLanguages = {
   'zh-TW': 'Chinese (Taiwan)'
 };
 
-// Create a WebSocket server
-const wss = new WebSocket.Server({ port: 3001 });
-console.log('WebSocket server started on port 3001');
+// Use port from environment (Render sets PORT) or fallback to 3001
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
+
+// Create a basic HTTP server. This allows the service to respond to normal
+// HTTP requests (so visiting the URL in a browser doesn't return "Upgrade Required")
+// and also lets the reverse proxy (Render) perform TLS termination and upgrade
+// the connection to WebSocket (wss).
+const server = http.createServer((req, res) => {
+  if (req.method === 'GET' && (req.url === '/' || req.url === '/status')) {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('STT WebSocket server is running. Connect via WebSocket (wss://...).');
+  } else {
+    res.writeHead(404);
+    res.end();
+  }
+});
+
+// Attach WebSocket server to the HTTP server so upgrades are handled correctly
+const wss = new WebSocket.Server({ noServer: true });
+
+server.on('upgrade', function upgrade(request, socket, head) {
+  // You can inspect the request.url here and accept/reject based on path or auth
+  wss.handleUpgrade(request, socket, head, function done(ws) {
+    wss.emit('connection', ws, request);
+  });
+});
+
+server.listen(PORT, () => {
+  console.log('HTTP/WebSocket server listening on port', PORT);
+});
 console.log(`Supported languages: ${Object.keys(supportedLanguages).length} languages`);
 
 // Create a Speech-to-Text client
